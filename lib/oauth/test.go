@@ -20,8 +20,10 @@ func NewTestProvider(s *httptest.Server) *Provider {
 		// The test implementation returns a fake user with an email address copied from the supplied access token.
 		func(t *oauth2.Token) (*UserInfo, error) {
 			return &UserInfo{
-				ID:    t.AccessToken,
-				Email: t.AccessToken,
+				ID:      t.AccessToken,
+				Email:   t.AccessToken,
+				Name:    t.AccessToken,
+				Picture: t.AccessToken,
 			}, nil
 		},
 	}

@@ -12,8 +12,10 @@ type Provider struct {
 
 // UserInfo is the minimum necessary needed from an OAuth Provider to connect with AuthN accounts
 type UserInfo struct {
-	ID    string `json:"id"`
-	Email string `json:"email"`
+	ID     string `json:"id"`
+	Email  string `json:"email"`
+	Name   string `json:"name"`
+	Avatar string `json:"avatar"`
 }
 
 // UserInfoFetcher is the function signature for fetching UserInfo from a Provider
