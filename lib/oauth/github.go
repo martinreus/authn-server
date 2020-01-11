@@ -33,9 +33,9 @@ func NewGitHubProvider(credentials *Credentials) *Provider {
 			}
 
 			var user struct {
-				ID string `json:"id"`
-				Name string `json:"name"`
-				Email string `json:"email"`
+				ID     string `json:"id"`
+				Name   string `json:"name"`
+				Email  string `json:"email"`
 				Avatar string `json:"avatar_url"`
 			}
 
@@ -45,10 +45,10 @@ func NewGitHubProvider(credentials *Credentials) *Provider {
 			}
 
 			return &UserInfo{
-				ID:     user.ID,
-				Email:  user.Email,
-				Name:   user.Name,
-				Avatar: user.Avatar,
+				ID:      user.ID,
+				Email:   user.Email,
+				Name:    user.Name,
+				Picture: user.Avatar,
 			}, nil
 		},
 	}
