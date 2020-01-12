@@ -11,6 +11,7 @@ func MigrateDB(db *sqlx.DB) error {
 		migrateAccounts,
 		createOauthAccounts,
 		createAccountLastLoginAtField,
+		createAccountNamePictureFields,
 	}
 	for _, m := range migrations {
 		if err := m(db); err != nil {
@@ -56,6 +57,14 @@ func createOauthAccounts(db *sqlx.DB) error {
 func createAccountLastLoginAtField(db *sqlx.DB) error {
 	_, err := db.Exec(`
         ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_at timestamptz DEFAULT NULL
+    `)
+	return err
+}
+
+func createAccountNamePictureFields(db *sqlx.DB) error {
+	_, err := db.Exec(`
+        ALTER TABLE accounts ADD COLUMN IF NOT EXISTS name VARCHAR(255) DEFAULT NULL;
+        ALTER TABLE accounts ADD COLUMN IF NOT EXISTS picture VARCHAR(512) DEFAULT NULL;
     `)
 	return err
 }

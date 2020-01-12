@@ -13,6 +13,7 @@ func MigrateDB(db *sqlx.DB) error {
 		createBlobs,
 		createOauthAccounts,
 		createAccountLastLoginAtField,
+		createAccountNamePictureFields
 	}
 	for _, m := range migrations {
 		if err := m(db); err != nil {
@@ -87,6 +88,14 @@ func createOauthAccounts(db *sqlx.DB) error {
 func createAccountLastLoginAtField(db *sqlx.DB) error {
 	_, err := db.Exec(`
         ALTER TABLE accounts ADD last_login_at DATETIME
+    `)
+	return err
+}
+
+func createAccountNamePictureFields(db *sqlx.DB) error {
+	_, err := db.Exec(`
+        ALTER TABLE accounts ADD name TEXT;
+        ALTER TABLE accounts ADD picture TEXT;
     `)
 	return err
 }

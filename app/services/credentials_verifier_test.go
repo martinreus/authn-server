@@ -31,7 +31,7 @@ func TestCredentialsVerifierFailure(t *testing.T) {
 
 	cfg := app.Config{BcryptCost: 4}
 	store := mock.NewAccountStore()
-	store.Create("known", bcrypted, "", "" )
+	store.Create("known", bcrypted, "", "")
 	acc, _ := store.Create("locked", bcrypted, "", "")
 	store.Lock(acc.ID)
 	acc, _ = store.Create("expired", bcrypted, "", "")
