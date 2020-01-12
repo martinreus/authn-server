@@ -13,7 +13,7 @@ import (
 
 var bcryptPattern = regexp.MustCompile(`\A\$2[ayb]\$[0-9]{2}\$[A-Za-z0-9\.\/]{53}\z`)
 
-func AccountImporter(store data.AccountStore, cfg *app.Config, username string, password string, locked bool) (*models.Account, error) {
+func AccountImporter(store data.AccountStore, cfg *app.Config, username string, password string, name string, pic string, locked bool) (*models.Account, error) {
 	if username == "" {
 		return nil, FieldErrors{{"username", ErrMissing}}
 	}
@@ -32,7 +32,7 @@ func AccountImporter(store data.AccountStore, cfg *app.Config, username string, 
 		}
 	}
 
-	acc, err := store.Create(username, hash)
+	acc, err := store.Create(username, hash, name, pic)
 	if err != nil {
 		if data.IsUniquenessError(err) {
 			return nil, FieldErrors{{"username", ErrTaken}}

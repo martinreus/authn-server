@@ -37,15 +37,17 @@ func getOpenConnectionCount(store data.AccountStore) int {
 }
 
 func testCreate(t *testing.T, store data.AccountStore) {
-	account, err := store.Create("authn@keratin.tech", []byte("password"))
+	account, err := store.Create("authn@keratin.tech", []byte("password"), "Keratin Auth", "http://apic.com/pic12312321.png")
 	require.NoError(t, err)
 	assert.NotEqual(t, 0, account.ID)
 	assert.Equal(t, "authn@keratin.tech", account.Username)
 	assert.NotEmpty(t, account.PasswordChangedAt)
+	assert.Equal(t,  "Keratin Auth", account.Name)
+	assert.Equal(t,  "http://apic.com/pic12312321.png", account.Picture)
 	assert.NotEmpty(t, account.CreatedAt)
 	assert.NotEmpty(t, account.UpdatedAt)
 
-	account, err = store.Create("authn@keratin.tech", []byte("password"))
+	account, err = store.Create("authn@keratin.tech", []byte("password"), "", "")
 	if account != nil {
 		assert.NotEqual(t, nil, account)
 	}
@@ -62,7 +64,7 @@ func testFindByUsername(t *testing.T, store data.AccountStore) {
 	assert.NoError(t, err)
 	assert.Nil(t, account)
 
-	_, err = store.Create("authn@keratin.tech", []byte("password"))
+	_, err = store.Create("authn@keratin.tech", []byte("password"), "", "")
 	require.NoError(t, err)
 
 	account, err = store.FindByUsername("authn@keratin.tech")
@@ -74,7 +76,7 @@ func testFindByUsername(t *testing.T, store data.AccountStore) {
 }
 
 func testLockAndUnlock(t *testing.T, store data.AccountStore) {
-	account, err := store.Create("authn@keratin.tech", []byte("password"))
+	account, err := store.Create("authn@keratin.tech", []byte("password"), "", "")
 	require.NoError(t, err)
 	require.False(t, account.Locked)
 
@@ -100,7 +102,7 @@ func testLockAndUnlock(t *testing.T, store data.AccountStore) {
 }
 
 func testArchive(t *testing.T, store data.AccountStore) {
-	account, err := store.Create("authn@keratin.tech", []byte("password"))
+	account, err := store.Create("authn@keratin.tech", []byte("password"), "", "")
 	require.NoError(t, err)
 	require.Empty(t, account.DeletedAt)
 
@@ -115,7 +117,7 @@ func testArchive(t *testing.T, store data.AccountStore) {
 	assert.Empty(t, after.Password)
 	assert.NotEmpty(t, after.DeletedAt)
 
-	account2, err := store.Create("authn@keratin.tech", []byte("password"))
+	account2, err := store.Create("authn@keratin.tech", []byte("password"), "", "")
 	if assert.NoError(t, err) {
 		ok, err = store.Archive(account2.ID)
 		assert.True(t, ok)
@@ -127,7 +129,7 @@ func testArchive(t *testing.T, store data.AccountStore) {
 }
 
 func testArchiveWithOauth(t *testing.T, store data.AccountStore) {
-	account, err := store.Create("authn@keratin.tech", []byte("password"))
+	account, err := store.Create("authn@keratin.tech", []byte("password"), "", "")
 	require.NoError(t, err)
 	err = store.AddOauthAccount(account.ID, "PROVIDER", "PROVIDERID", "token")
 	require.NoError(t, err)
@@ -145,7 +147,7 @@ func testArchiveWithOauth(t *testing.T, store data.AccountStore) {
 }
 
 func testRequireNewPassword(t *testing.T, store data.AccountStore) {
-	account, err := store.Create("authn@keratin.tech", []byte("password"))
+	account, err := store.Create("authn@keratin.tech", []byte("password"), "", "")
 	require.NoError(t, err)
 	require.False(t, account.RequireNewPassword)
 
@@ -162,7 +164,7 @@ func testRequireNewPassword(t *testing.T, store data.AccountStore) {
 }
 
 func testSetPassword(t *testing.T, store data.AccountStore) {
-	account, err := store.Create("authn@keratin.tech", []byte("old"))
+	account, err := store.Create("authn@keratin.tech", []byte("old"), "", "")
 	require.NoError(t, err)
 	ok, err := store.RequireNewPassword(account.ID)
 	require.True(t, ok)
@@ -183,10 +185,10 @@ func testSetPassword(t *testing.T, store data.AccountStore) {
 }
 
 func testUpdateUsername(t *testing.T, store data.AccountStore) {
-	other, err := store.Create("other", []byte("other"))
+	other, err := store.Create("other", []byte("other"), "", "")
 	require.NoError(t, err)
 
-	account, err := store.Create("old", []byte("old"))
+	account, err := store.Create("old", []byte("old"), "", "")
 	require.NoError(t, err)
 
 	ok, err := store.UpdateUsername(account.ID, "new")
@@ -216,7 +218,7 @@ func testAddOauthAccount(t *testing.T, store data.AccountStore) {
 	require.NoError(t, err)
 	assert.Len(t, found, 0)
 
-	account, err := store.Create("authn@keratin.tech", []byte("password"))
+	account, err := store.Create("authn@keratin.tech", []byte("password"), "", "")
 	assert.NoError(t, err)
 	err = store.AddOauthAccount(account.ID, "OAUTHPROVIDER", "PROVIDERID", "TOKEN")
 	assert.NoError(t, err)
@@ -245,7 +247,7 @@ func testFindByOauthAccount(t *testing.T, store data.AccountStore) {
 	assert.NoError(t, err)
 	assert.Nil(t, found)
 
-	account, err := store.Create("authn@keratin.tech", []byte("password"))
+	account, err := store.Create("authn@keratin.tech", []byte("password"), "", "")
 	require.NoError(t, err)
 	err = store.AddOauthAccount(account.ID, "OAUTHPROVIDER", "PROVIDERID", "TOKEN")
 	require.NoError(t, err)
@@ -267,7 +269,7 @@ func testFindByOauthAccount(t *testing.T, store data.AccountStore) {
 }
 
 func testSetLastLogin(t *testing.T, store data.AccountStore) {
-	account, err := store.Create("old", []byte("old"))
+	account, err := store.Create("old", []byte("old"), "", "")
 	require.NoError(t, err)
 
 	rowsIsAffected, err := store.SetLastLogin(account.ID)

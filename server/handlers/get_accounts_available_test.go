@@ -15,7 +15,7 @@ func TestGetAccountsAvailable(t *testing.T) {
 	server := test.Server(app)
 	defer server.Close()
 
-	account, err := app.AccountStore.Create("existing@test.com", []byte("bar"))
+	account, err := app.AccountStore.Create("existing@test.com", []byte("bar"), "", "")
 	require.NoError(t, err)
 
 	client := route.NewClient(server.URL).Referred(&app.Config.ApplicationDomains[0])
