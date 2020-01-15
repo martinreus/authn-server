@@ -55,8 +55,8 @@ func TestAccountCreatorFailure(t *testing.T) {
 		{app.Config{UsernameIsEmail: true}, "@wrong.com", "PASSword", "", "", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
 		{app.Config{UsernameIsEmail: true}, "wrong@wrong", "PASSword", "", "", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
 		{app.Config{UsernameIsEmail: true}, "wrong@wrong.", "PASSword", "", "", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
-		{app.Config{UsernameIsEmail: true, UsernameDomains: []string{"rightdomain.com"}}, "", "", "email@wrongdomain.com", "PASSword", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
-		{app.Config{UsernameIsEmail: false, UsernameMinLength: 6}, "short", "", "", "PASSword", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
+		{app.Config{UsernameIsEmail: true, UsernameDomains: []string{"rightdomain.com"}}, "email@wrongdomain.com", "PASSword", "", "", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
+		{app.Config{UsernameIsEmail: false, UsernameMinLength: 6}, "short", "PASSword", "", "", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
 		// password validations
 		{app.Config{}, "username", "", "", "", services.FieldErrors{{"password", "MISSING"}}},
 		{app.Config{PasswordMinComplexity: 2}, "username", "qwerty", "", "", services.FieldErrors{{"password", "INSECURE"}}},

@@ -13,7 +13,7 @@ func MigrateDB(db *sqlx.DB) error {
 		createBlobs,
 		createOauthAccounts,
 		createAccountLastLoginAtField,
-		createAccountNamePictureFields
+		createAccountNamePictureFields,
 	}
 	for _, m := range migrations {
 		if err := m(db); err != nil {

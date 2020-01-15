@@ -26,7 +26,7 @@ func TestPatchAccountExpirePassword(t *testing.T) {
 	})
 
 	t.Run("active account", func(t *testing.T) {
-		account, err := app.AccountStore.Create("active@test.com", []byte("bar"))
+		account, err := app.AccountStore.Create("active@test.com", []byte("bar"), "", "")
 		require.NoError(t, err)
 
 		res, err := client.Patch(fmt.Sprintf("/accounts/%v/expire_password", account.ID), url.Values{})

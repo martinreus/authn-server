@@ -27,7 +27,7 @@ func TestSessionCreator(t *testing.T) {
 	reporter := &ops.LogReporter{logrus.New()}
 
 	audience := &route.Domain{"authn.example.com", "8080"}
-	account, err := accountStore.Create("existing", []byte("secret"))
+	account, err := accountStore.Create("existing", []byte("secret"), "", "")
 	require.NoError(t, err)
 
 	t.Run("tracks last login while generating tokens", func(t *testing.T) {

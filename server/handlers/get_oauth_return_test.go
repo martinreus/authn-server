@@ -60,7 +60,7 @@ func TestGetOauthReturn(t *testing.T) {
 	})
 
 	t.Run("connect new identity with current session", func(t *testing.T) {
-		account, err := app.AccountStore.Create("existing@keratin.tech", []byte("password"))
+		account, err := app.AccountStore.Create("existing@keratin.tech", []byte("password"), "", "")
 		require.NoError(t, err)
 		session := test.CreateSession(app.RefreshTokenStore, app.Config, account.ID)
 
@@ -72,7 +72,7 @@ func TestGetOauthReturn(t *testing.T) {
 	})
 
 	t.Run("not connect new identity with current session that is already linked", func(t *testing.T) {
-		account, err := app.AccountStore.Create("linked@keratin.tech", []byte("password"))
+		account, err := app.AccountStore.Create("linked@keratin.tech", []byte("password"), "", "")
 		require.NoError(t, err)
 		app.AccountStore.AddOauthAccount(account.ID, "test", "PREVIOUSID", "TOKEN")
 		session := test.CreateSession(app.RefreshTokenStore, app.Config, account.ID)
@@ -83,7 +83,7 @@ func TestGetOauthReturn(t *testing.T) {
 	})
 
 	t.Run("log in to existing identity", func(t *testing.T) {
-		account, err := app.AccountStore.Create("registered@keratin.tech", []byte("password"))
+		account, err := app.AccountStore.Create("registered@keratin.tech", []byte("password"), "", "")
 		require.NoError(t, err)
 		err = app.AccountStore.AddOauthAccount(account.ID, "test", "REGISTEREDID", "TOKEN")
 		require.NoError(t, err)
@@ -98,7 +98,7 @@ func TestGetOauthReturn(t *testing.T) {
 	})
 
 	t.Run("log in to locked identity", func(t *testing.T) {
-		account, err := app.AccountStore.Create("locked@keratin.tech", []byte("password"))
+		account, err := app.AccountStore.Create("locked@keratin.tech", []byte("password"), "", "")
 		require.NoError(t, err)
 		_, err = app.AccountStore.Lock(account.ID)
 		require.NoError(t, err)
@@ -109,7 +109,7 @@ func TestGetOauthReturn(t *testing.T) {
 	})
 
 	t.Run("email collision", func(t *testing.T) {
-		_, err := app.AccountStore.Create("collision@keratin.tech", []byte("password"))
+		_, err := app.AccountStore.Create("collision@keratin.tech", []byte("password"), "", "")
 		require.NoError(t, err)
 
 		res, err := client.Get("/oauth/test/return?code=collision@keratin.tech&state=" + state)

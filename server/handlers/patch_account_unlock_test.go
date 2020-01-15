@@ -26,7 +26,7 @@ func TestPatchAccountUnlock(t *testing.T) {
 	})
 
 	t.Run("unlocked account", func(t *testing.T) {
-		account, err := app.AccountStore.Create("unlocked@test.com", []byte("bar"))
+		account, err := app.AccountStore.Create("unlocked@test.com", []byte("bar"), "", "")
 		require.NoError(t, err)
 
 		res, err := client.Patch(fmt.Sprintf("/accounts/%v/unlock", account.ID), url.Values{})
@@ -39,7 +39,7 @@ func TestPatchAccountUnlock(t *testing.T) {
 	})
 
 	t.Run("locked account", func(t *testing.T) {
-		account, err := app.AccountStore.Create("locked@test.com", []byte("bar"))
+		account, err := app.AccountStore.Create("locked@test.com", []byte("bar"), "", "")
 		require.NoError(t, err)
 		app.AccountStore.Lock(account.ID)
 

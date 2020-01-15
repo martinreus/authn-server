@@ -37,11 +37,11 @@ func TestPasswordResetter(t *testing.T) {
 		return err
 	}
 
-	account, err := accountStore.Create("existing@keratin.tech", []byte("old"))
+	account, err := accountStore.Create("existing@keratin.tech", []byte("old"), "", "")
 	require.NoError(t, err)
 
 	t.Run("sets new password", func(t *testing.T) {
-		expired, err := accountStore.Create("expired@keratin.tech", []byte("old"))
+		expired, err := accountStore.Create("expired@keratin.tech", []byte("old"), "", "")
 		require.NoError(t, err)
 		_, err = accountStore.RequireNewPassword(expired.ID)
 		require.NoError(t, err)
@@ -71,7 +71,7 @@ func TestPasswordResetter(t *testing.T) {
 	})
 
 	t.Run("on an archived account", func(t *testing.T) {
-		archived, err := accountStore.Create("archived@keratin.tech", []byte("old"))
+		archived, err := accountStore.Create("archived@keratin.tech", []byte("old"), "", "")
 		require.NoError(t, err)
 		_, err = accountStore.Archive(archived.ID)
 		require.NoError(t, err)
@@ -83,7 +83,7 @@ func TestPasswordResetter(t *testing.T) {
 	})
 
 	t.Run("on a locked account", func(t *testing.T) {
-		locked, err := accountStore.Create("locked@keratin.tech", []byte("old"))
+		locked, err := accountStore.Create("locked@keratin.tech", []byte("old"), "", "")
 		require.NoError(t, err)
 		_, err = accountStore.Lock(locked.ID)
 		require.NoError(t, err)
