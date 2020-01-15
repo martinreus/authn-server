@@ -22,6 +22,8 @@ func (db *AccountStore) Find(id int) (*models.Account, error) {
 	}
 	if account.DeletedAt != nil {
 		account.Username = ""
+		account.Picture = ""
+		account.Name = ""
 	}
 	return &account, nil
 }
