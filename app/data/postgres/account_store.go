@@ -67,8 +67,8 @@ func (db *AccountStore) Create(un string, pw []byte, name string, pic string) (*
 		`INSERT INTO accounts (
 			username,
 			password,
-            name,
-            picture,
+			name,
+			picture,
 			locked,
 			require_new_password,
 			password_changed_at,
