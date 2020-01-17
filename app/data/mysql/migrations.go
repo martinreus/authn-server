@@ -61,7 +61,7 @@ func createOauthAccounts(db *sqlx.DB) error {
 
 func createAccountLastLoginAtField(db *sqlx.DB) error {
 	_, err := db.Exec(`
-        ALTER TABLE accounts ADD last_login_at DATETIME DEFAULT NULL
+        ALTER TABLE accounts ADD last_login_at DATETIME DEFAULT NULL;
     `)
 	if mysqlError, ok := err.(*mysql.MySQLError); ok {
 		if mysqlError.Number == 1060 { // 1060 = Duplicate column name
@@ -73,8 +73,9 @@ func createAccountLastLoginAtField(db *sqlx.DB) error {
 
 func addNameAndAvatarFields(db *sqlx.DB) error {
 	_, err := db.Exec(`
-        ALTER TABLE accounts ADD name VARCHAR(255) DEFAULT NULL;
-		ALTER TABLE accounts ADD picture VARCHAR(512) DEFAULT NULL;
+        ALTER TABLE accounts 
+            ADD name VARCHAR(255) DEFAULT NULL,
+			ADD picture VARCHAR(512) DEFAULT NULL;
     `)
 	if mysqlError, ok := err.(*mysql.MySQLError); ok {
 		if mysqlError.Number == 1060 { // 1060 = Duplicate column name
