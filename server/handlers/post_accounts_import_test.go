@@ -23,13 +23,15 @@ func TestPostAccountsImport(t *testing.T) {
 		res, err := client.PostForm("/accounts/import", url.Values{
 			"username": []string{"someone@app.com"},
 			"password": []string{"secret"},
+			"name":		[]string{"A Name"},
+			"picture":  []string{"http://picture.com"},
 		})
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusCreated, res.StatusCode)
 
 		account, err := app.AccountStore.FindByUsername("someone@app.com")
 		require.NoError(t, err)
-		test.AssertData(t, res, map[string]int{"id": account.ID})
+		test.AssertData(t, res, map[string]interface{}{"id": account.ID, "name": "A Name", "picture": "http://picture.com"})
 	})
 
 	t.Run("importing a locked user", func(t *testing.T) {

@@ -21,7 +21,7 @@ func PostAccountsImport(app *app.App) http.HandlerFunc {
 			r.FormValue("username"),
 			r.FormValue("password"),
 			r.FormValue("name"),
-			r.FormValue("pic"),
+			r.FormValue("picture"),
 			locked,
 		)
 		if err != nil {
@@ -33,8 +33,10 @@ func PostAccountsImport(app *app.App) http.HandlerFunc {
 			panic(err)
 		}
 
-		WriteData(w, http.StatusCreated, map[string]int{
+		WriteData(w, http.StatusCreated, map[string]interface{}{
 			"id": account.ID,
+			"name": account.Name,
+			"picture": account.Picture,
 		})
 	}
 }
