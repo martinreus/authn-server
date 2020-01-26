@@ -3,6 +3,3 @@
 vendor/
 dist/
 .idea
-.fuse**
-*.todo
-
