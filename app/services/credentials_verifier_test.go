@@ -17,7 +17,7 @@ func TestCredentialsVerifierSuccess(t *testing.T) {
 
 	cfg := app.Config{BcryptCost: 4}
 	store := mock.NewAccountStore()
-	store.Create(username, bcrypted, "", "")
+	store.Create(services.User{Username: username, Password: bcrypted})
 
 	acc, err := services.CredentialsVerifier(store, &cfg, username, password)
 	require.NoError(t, err)
@@ -31,10 +31,10 @@ func TestCredentialsVerifierFailure(t *testing.T) {
 
 	cfg := app.Config{BcryptCost: 4}
 	store := mock.NewAccountStore()
-	store.Create("known", bcrypted, "", "")
-	acc, _ := store.Create("locked", bcrypted, "", "")
+	store.Create(services.User{Username: "known", Password: bcrypted})
+	acc, _ := store.Create(services.User{Username: "locked", Password: bcrypted})
 	store.Lock(acc.ID)
-	acc, _ = store.Create("expired", bcrypted, "", "")
+	acc, _ = store.Create(services.User{Username: "expired", Password: bcrypted})
 	store.RequireNewPassword(acc.ID)
 
 	testCases := []struct {

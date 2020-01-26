@@ -14,7 +14,7 @@ func TestPasswordExpirer(t *testing.T) {
 	refreshStore := mock.NewRefreshTokenStore()
 
 	t.Run("active account", func(t *testing.T) {
-		account, err := accountStore.Create("active", []byte("secret"), "", "")
+		account, err := accountStore.Create(services.User{Username: "active", Password: []byte("secret")})
 		require.NoError(t, err)
 		token1, err := refreshStore.Create(account.ID)
 		require.NoError(t, err)

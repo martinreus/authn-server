@@ -21,7 +21,7 @@ func TestAccountImporter(t *testing.T) {
 		BcryptCost: 4,
 	}
 
-	_, err := accountStore.Create("existing", []byte("secret"), "A Name", "aPicURL")
+	_, err := accountStore.Create(services.User{Username: "existing", Password: []byte("secret"), Name: "A Name", PictureURL: "aPicURL"})
 	require.NoError(t, err)
 
 	testCases := []struct {
@@ -42,7 +42,7 @@ func TestAccountImporter(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		account, errors := services.AccountImporter(accountStore, cfg, tc.username, string(tc.password), tc.name, tc.pic, tc.locked)
+		account, errors := services.AccountImporter(accountStore, cfg, services.User{Username: tc.username, Password: tc.password, Name: tc.name, PictureURL: tc.pic}, tc.locked)
 		if tc.errors == nil {
 			assert.Empty(t, errors)
 			assert.NotEmpty(t, account)

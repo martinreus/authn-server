@@ -20,7 +20,7 @@ func TestPostSessionSuccess(t *testing.T) {
 	defer server.Close()
 
 	b, _ := bcrypt.GenerateFromPassword([]byte("bar"), 4)
-	app.AccountStore.Create("foo", b, "", "")
+	app.AccountStore.Create(test.User{Username: "foo", Password: b})
 
 	client := route.NewClient(server.URL).Referred(&app.Config.ApplicationDomains[0])
 	res, err := client.PostForm("/session", url.Values{
@@ -40,7 +40,7 @@ func TestPostSessionSuccessWithSession(t *testing.T) {
 	defer server.Close()
 
 	b, _ := bcrypt.GenerateFromPassword([]byte("bar"), 4)
-	app.AccountStore.Create("foo", b, "", "")
+	app.AccountStore.Create(test.User{Username: "foo", Password: b})
 
 	accountID := 8642
 	session := test.CreateSession(app.RefreshTokenStore, app.Config, accountID)

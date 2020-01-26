@@ -14,7 +14,7 @@ func TestAccountArchiver(t *testing.T) {
 	refreshStore := mock.NewRefreshTokenStore()
 
 	t.Run("existing account", func(t *testing.T) {
-		account, err := accountStore.Create("test@keratin.tech", []byte("password"), "", "")
+		account, err := accountStore.Create(services.User{Username: "test@keratin.tech", Password: []byte("password")})
 		require.NoError(t, err)
 
 		errs := services.AccountArchiver(accountStore, refreshStore, account.ID)
@@ -28,7 +28,7 @@ func TestAccountArchiver(t *testing.T) {
 	})
 
 	t.Run("logged in account", func(t *testing.T) {
-		account, err := accountStore.Create("loggedin@keratin.tech", []byte("password"), "", "")
+		account, err := accountStore.Create(services.User{Username: "loggedin@keratin.tech", Password: []byte("password")})
 		require.NoError(t, err)
 		token1, err := refreshStore.Create(account.ID)
 		require.NoError(t, err)

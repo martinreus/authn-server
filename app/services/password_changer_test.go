@@ -33,7 +33,7 @@ func TestPasswordChanger(t *testing.T) {
 			return nil, errors.Wrap(err, "bcrypt")
 		}
 
-		return accountStore.Create(username, hash, "", "")
+		return accountStore.Create(services.User{Username: username, Password: hash})
 	}
 
 	account, err := factory("existing@keratin.tech", "old")
