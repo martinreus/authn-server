@@ -38,10 +38,10 @@ func newTestDB() (*sqlx.DB, error) {
 func TestAccountStore(t *testing.T) {
 	db, err := newTestDB()
 	require.NoError(t, err)
-	store := &postgres.AccountStore{db}
+	store := postgres.New(db)
 	for _, tester := range testers.AccountStoreTesters {
 		db.MustExec("TRUNCATE accounts")
 		db.MustExec("TRUNCATE oauth_accounts")
-		tester(t, store)
+		tester(t, &store)
 	}
 }

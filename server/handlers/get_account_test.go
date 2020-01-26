@@ -32,7 +32,7 @@ func TestGetAccount(t *testing.T) {
 	})
 
 	t.Run("valid account", func(t *testing.T) {
-		account, err := app.AccountStore.Create("unlocked@test.com", []byte("bar"), "Some Dude", "http://pic.com")
+		account, err := app.AccountStore.Create(test.User{Username: "unlocked@test.com", Password: []byte("bar"), Name: "Some Dude", PictureURL: "http://pic.com"})
 		require.NoError(t, err)
 
 		res, err := client.Get(fmt.Sprintf("/accounts/%v", account.ID))

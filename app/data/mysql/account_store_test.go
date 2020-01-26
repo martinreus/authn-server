@@ -11,10 +11,10 @@ import (
 func TestAccountStore(t *testing.T) {
 	db, err := mysql.TestDB()
 	require.NoError(t, err)
-	store := &mysql.AccountStore{db}
+	store := mysql.New(db)
 	for _, tester := range testers.AccountStoreTesters {
 		db.MustExec("TRUNCATE accounts")
 		db.MustExec("TRUNCATE oauth_accounts")
-		tester(t, store)
+		tester(t, &store)
 	}
 }

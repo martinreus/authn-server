@@ -20,7 +20,7 @@ func TestIdentityReconciler(t *testing.T) {
 	cfg := &app.Config{}
 
 	t.Run("linked account should update name and pic if empty", func(t *testing.T) {
-		acct, err := store.Create("linked@test.com", []byte("password"), "", "")
+		acct, err := store.Create(services.User{Username: "linked@test.com", Password: []byte("password")})
 		require.NoError(t, err)
 		err = store.AddOauthAccount(acct.ID, "testProvider", "123", "TOKEN")
 		require.NoError(t, err)
@@ -36,7 +36,7 @@ func TestIdentityReconciler(t *testing.T) {
 	})
 
 	t.Run("linked account should maintain old name", func(t *testing.T) {
-		acct, err := store.Create("linkedWithName@test.com", []byte("password"), "Old Name", "oldPic")
+		acct, err := store.Create(services.User{Username: "linkedWithName@test.com", Password: []byte("password"), Name: "Old Name", PictureURL: "oldPic"})
 		require.NoError(t, err)
 		err = store.AddOauthAccount(acct.ID, "testProvider", "555", "TOKEN")
 		require.NoError(t, err)
@@ -51,7 +51,7 @@ func TestIdentityReconciler(t *testing.T) {
 	})
 
 	t.Run("linked account that is locked", func(t *testing.T) {
-		acct, err := store.Create("linkedlocked@test.com", []byte("password"), "", "")
+		acct, err := store.Create(services.User{Username: "linkedlocked@test.com", Password: []byte("password")})
 		require.NoError(t, err)
 		err = store.AddOauthAccount(acct.ID, "testProvider", "234", "TOKEN")
 		require.NoError(t, err)
@@ -64,7 +64,7 @@ func TestIdentityReconciler(t *testing.T) {
 	})
 
 	t.Run("linkable account updating name and pic", func(t *testing.T) {
-		acct, err := store.Create("linkable@test.com", []byte("password"), "", "")
+		acct, err := store.Create(services.User{Username: "linkable@test.com", Password: []byte("password")})
 		require.NoError(t, err)
 
 		found, err := services.IdentityReconciler(store, cfg, "testProvider", &oauth.UserInfo{ID: "345", Email: "linkable@test.com", Name: "New Name", Picture: "newPic"}, &oauth2.Token{}, acct.ID)
@@ -77,7 +77,7 @@ func TestIdentityReconciler(t *testing.T) {
 	})
 
 	t.Run("linkable account maintains old name", func(t *testing.T) {
-		acct, err := store.Create("linkableWithName@test.com", []byte("password"), "Old Name", "oldPic")
+		acct, err := store.Create(services.User{Username: "linkableWithName@test.com", Password: []byte("password"), Name: "Old Name", PictureURL: "oldPic"})
 		require.NoError(t, err)
 
 		found, err := services.IdentityReconciler(store, cfg, "testProvider", &oauth.UserInfo{ID: "666", Email: "linkableWithName@test.com", Name: "New Name", Picture: "newPic"}, &oauth2.Token{}, acct.ID)
@@ -90,7 +90,7 @@ func TestIdentityReconciler(t *testing.T) {
 	})
 
 	t.Run("linkable account that is linked", func(t *testing.T) {
-		acct, err := store.Create("linkablelinked@test.com", []byte("password"), "", "")
+		acct, err := store.Create(services.User{Username: "linkablelinked@test.com", Password: []byte("password")})
 		require.NoError(t, err)
 		err = store.AddOauthAccount(acct.ID, "testProvider", "0", "TOKEN")
 		require.NoError(t, err)
@@ -109,7 +109,7 @@ func TestIdentityReconciler(t *testing.T) {
 	})
 
 	t.Run("new account with username collision", func(t *testing.T) {
-		_, err := store.Create("existing@test.com", []byte("password"), "", "")
+		_, err := store.Create(services.User{Username: "existing@test.com", Password: []byte("password")})
 		require.NoError(t, err)
 
 		found, err := services.IdentityReconciler(store, cfg, "testProvider", &oauth.UserInfo{ID: "678", Email: "existing@test.com"}, &oauth2.Token{}, 0)

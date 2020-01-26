@@ -14,7 +14,7 @@ func TestAccountLocker(t *testing.T) {
 	refreshStore := mock.NewRefreshTokenStore()
 
 	t.Run("logged in account", func(t *testing.T) {
-		account, err := accountStore.Create("loggedin@keratin.tech", []byte("password"), "", "")
+		account, err := accountStore.Create(services.User{Username: "loggedin@keratin.tech", Password: []byte("password")})
 		require.NoError(t, err)
 		token1, err := refreshStore.Create(account.ID)
 		require.NoError(t, err)
@@ -28,7 +28,7 @@ func TestAccountLocker(t *testing.T) {
 	})
 
 	t.Run("locked account", func(t *testing.T) {
-		account, err := accountStore.Create("locked@keratin.tech", []byte("password"), "", "")
+		account, err := accountStore.Create(services.User{Username: "locked@keratin.tech", Password: []byte("password")})
 		require.NoError(t, err)
 		_, err = accountStore.Lock(account.ID)
 		require.NoError(t, err)
@@ -42,7 +42,7 @@ func TestAccountLocker(t *testing.T) {
 	})
 
 	t.Run("unlocked account", func(t *testing.T) {
-		account, err := accountStore.Create("unlocked@keratin.tech", []byte("password"), "", "")
+		account, err := accountStore.Create(services.User{Username: "unlocked@keratin.tech", Password: []byte("password")})
 		require.NoError(t, err)
 
 		errs := services.AccountLocker(accountStore, refreshStore, account.ID)

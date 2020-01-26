@@ -40,7 +40,7 @@ func TestPostPassword(t *testing.T) {
 			return nil, errors.Wrap(err, "bcrypt")
 		}
 
-		return app.AccountStore.Create(username, hash, "", "")
+		return app.AccountStore.Create(test.User{Username: username, Password: hash})
 	}
 
 	t.Run("valid reset token", func(t *testing.T) {

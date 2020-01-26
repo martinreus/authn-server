@@ -14,7 +14,12 @@ func PostAccount(app *app.App) http.HandlerFunc {
 		// Create the account
 		account, err := services.AccountCreator(
 			app.AccountStore,
-			app.Config, r.FormValue("username"), r.FormValue("password"), r.FormValue("name"), "")
+			app.Config, services.User{
+				Username:   r.FormValue("username"),
+				Password:   []byte(r.FormValue("password")),
+				Name:       r.FormValue("name"),
+				PictureURL: r.FormValue("pictureURL"),
+			})
 		if err != nil {
 			if fe, ok := err.(services.FieldErrors); ok {
 				WriteErrors(w, fe)

@@ -26,7 +26,7 @@ func TestAccountCreatorSuccess(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		acc, err := services.AccountCreator(store, &tc.config, tc.username, tc.password, tc.name, tc.pic)
+		acc, err := services.AccountCreator(store, &tc.config, services.User{Username: tc.username, Password: []byte(tc.password), Name: tc.name, PictureURL: tc.pic})
 		require.NoError(t, err)
 		assert.NotEqual(t, 0, acc.ID)
 		assert.Equal(t, tc.username, acc.Username)
@@ -37,7 +37,7 @@ var pw = []byte("$2a$04$ZOBA8E3nT68/ArE6NDnzfezGWEgM6YrE17PrOtSjT5.U/ZGoxyh7e")
 
 func TestAccountCreatorFailure(t *testing.T) {
 	store := mock.NewAccountStore()
-	store.Create("existing@test.com", pw, "", "")
+	store.Create(services.User{Username: "existing@test.com", Password: pw})
 
 	var testCases = []struct {
 		config   app.Config
@@ -66,7 +66,7 @@ func TestAccountCreatorFailure(t *testing.T) {
 		t.Run(tc.username, func(t *testing.T) {
 
 			//acc, err := services.AccountCreator(store, &tc.config, tc.username, tc.password)
-			acc, err := services.AccountCreator(store, &tc.config, tc.username, tc.password, tc.name, tc.pic)
+			acc, err := services.AccountCreator(store, &tc.config, services.User{Username: tc.username, Password: []byte(tc.password), Name: tc.name, PictureURL: tc.pic})
 			if assert.Equal(t, tc.errors, err) {
 				assert.Empty(t, acc)
 			}
