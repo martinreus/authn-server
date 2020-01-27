@@ -55,7 +55,7 @@ func (db *accountStore) FindByOauthAccount(provider string, providerID string) (
 }
 
 func (db *accountStore) Create(user struct {
-	Username   string // must be set
+	Username   string
 	Password   []byte
 	Name       string
 	PictureURL string
