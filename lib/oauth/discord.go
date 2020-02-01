@@ -35,8 +35,25 @@ func NewDiscordProvider(credentials *Credentials) *Provider {
 				return nil, err
 			}
 
-			var user UserInfo
-			err = json.Unmarshal(body, &user)
+			var dUser struct{
+				ID string `json:"id"`
+				Username string `json:"username"`
+				Email string `json:"email"`
+				AvatarHash string `json:"avatar"`
+			}
+
+			err = json.Unmarshal(body, &dUser)
+
+			user := UserInfo{
+				ID:      dUser.ID,
+				Email: dUser.Email,
+				Name: dUser.Username,
+				// avatar hash, need to check how to retrieve the proper link!?!
+				// Discord documentation:
+				// https://discordapp.com/developers/docs/resources/user#user-object
+				//
+				// PictureURL: "https://cdn.discordapp.com/avatars/" + dUser.ID + "/" + dUser.AvatarHash + ".png",
+			}
 			return &user, err
 		},
 	}

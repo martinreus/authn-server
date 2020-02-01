@@ -17,14 +17,16 @@ func TestAccountCreatorSuccess(t *testing.T) {
 		config   app.Config
 		username string
 		password string
+		name     string
+		pic      string
 	}{
-		{app.Config{UsernameIsEmail: false, UsernameMinLength: 6}, "userName", "PASSword"},
-		{app.Config{UsernameIsEmail: true}, "username@test.com", "PASSword"},
-		{app.Config{UsernameIsEmail: true, UsernameDomains: []string{"rightdomain.com"}}, "username@rightdomain.com", "PASSword"},
+		{app.Config{UsernameIsEmail: false, UsernameMinLength: 6}, "userName", "PASSword", "", ""},
+		{app.Config{UsernameIsEmail: true}, "username@test.com", "PASSword", "", ""},
+		{app.Config{UsernameIsEmail: true, UsernameDomains: []string{"rightdomain.com"}}, "username@rightdomain.com", "PASSword", "", ""},
 	}
 
 	for _, tc := range testCases {
-		acc, err := services.AccountCreator(store, &tc.config, tc.username, tc.password)
+		acc, err := services.AccountCreator(store, &tc.config, services.User{Username: tc.username, Password: []byte(tc.password), Name: tc.name, PictureURL: tc.pic})
 		require.NoError(t, err)
 		assert.NotEqual(t, 0, acc.ID)
 		assert.Equal(t, tc.username, acc.Username)
@@ -35,32 +37,36 @@ var pw = []byte("$2a$04$ZOBA8E3nT68/ArE6NDnzfezGWEgM6YrE17PrOtSjT5.U/ZGoxyh7e")
 
 func TestAccountCreatorFailure(t *testing.T) {
 	store := mock.NewAccountStore()
-	store.Create("existing@test.com", pw)
+	store.Create(services.User{Username: "existing@test.com", Password: pw})
 
 	var testCases = []struct {
 		config   app.Config
 		username string
 		password string
+		name     string
+		pic      string
 		errors   services.FieldErrors
 	}{
 		// username validations
-		{app.Config{}, "", "PASSword", services.FieldErrors{{"username", "MISSING"}}},
-		{app.Config{}, "  ", "PASSword", services.FieldErrors{{"username", "MISSING"}}},
-		{app.Config{}, "existing@test.com", "PASSword", services.FieldErrors{{"username", "TAKEN"}}},
-		{app.Config{UsernameIsEmail: true}, "notanemail", "PASSword", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
-		{app.Config{UsernameIsEmail: true}, "@wrong.com", "PASSword", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
-		{app.Config{UsernameIsEmail: true}, "wrong@wrong", "PASSword", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
-		{app.Config{UsernameIsEmail: true}, "wrong@wrong.", "PASSword", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
-		{app.Config{UsernameIsEmail: true, UsernameDomains: []string{"rightdomain.com"}}, "email@wrongdomain.com", "PASSword", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
-		{app.Config{UsernameIsEmail: false, UsernameMinLength: 6}, "short", "PASSword", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
+		{app.Config{}, "", "PASSword", "", "", services.FieldErrors{{"username", "MISSING"}}},
+		{app.Config{}, "  ", "PASSword", "", "", services.FieldErrors{{"username", "MISSING"}}},
+		{app.Config{}, "existing@test.com", "PASSword", "", "", services.FieldErrors{{"username", "TAKEN"}}},
+		{app.Config{UsernameIsEmail: true}, "notanemail", "PASSword", "", "", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
+		{app.Config{UsernameIsEmail: true}, "@wrong.com", "PASSword", "", "", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
+		{app.Config{UsernameIsEmail: true}, "wrong@wrong", "PASSword", "", "", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
+		{app.Config{UsernameIsEmail: true}, "wrong@wrong.", "PASSword", "", "", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
+		{app.Config{UsernameIsEmail: true, UsernameDomains: []string{"rightdomain.com"}}, "email@wrongdomain.com", "PASSword", "", "", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
+		{app.Config{UsernameIsEmail: false, UsernameMinLength: 6}, "short", "PASSword", "", "", services.FieldErrors{{"username", "FORMAT_INVALID"}}},
 		// password validations
-		{app.Config{}, "username", "", services.FieldErrors{{"password", "MISSING"}}},
-		{app.Config{PasswordMinComplexity: 2}, "username", "qwerty", services.FieldErrors{{"password", "INSECURE"}}},
+		{app.Config{}, "username", "", "", "", services.FieldErrors{{"password", "MISSING"}}},
+		{app.Config{PasswordMinComplexity: 2}, "username", "qwerty", "", "", services.FieldErrors{{"password", "INSECURE"}}},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.username, func(t *testing.T) {
-			acc, err := services.AccountCreator(store, &tc.config, tc.username, tc.password)
+
+			//acc, err := services.AccountCreator(store, &tc.config, tc.username, tc.password)
+			acc, err := services.AccountCreator(store, &tc.config, services.User{Username: tc.username, Password: []byte(tc.password), Name: tc.name, PictureURL: tc.pic})
 			if assert.Equal(t, tc.errors, err) {
 				assert.Empty(t, acc)
 			}

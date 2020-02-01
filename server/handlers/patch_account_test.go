@@ -28,7 +28,7 @@ func TestPatchAccount(t *testing.T) {
 	})
 
 	t.Run("existing account", func(t *testing.T) {
-		account, err := app.AccountStore.Create("one@test.com", []byte("bar"))
+		account, err := app.AccountStore.Create(test.User{Username: "one@test.com", Password: []byte("bar")})
 		require.NoError(t, err)
 
 		res, err := client.Patch(fmt.Sprintf("/accounts/%v", account.ID), url.Values{"username": []string{"newname"}})
@@ -41,7 +41,7 @@ func TestPatchAccount(t *testing.T) {
 	})
 
 	t.Run("existing account using JSON", func(t *testing.T) {
-		account, err := app.AccountStore.Create("two@test.com", []byte("bar"))
+		account, err := app.AccountStore.Create(test.User{Username: "two@test.com", Password: []byte("bar")})
 		require.NoError(t, err)
 
 		res, err := client.PatchJSON(fmt.Sprintf("/accounts/%v", account.ID), "{\"username\": \"secondUsername\"}")
@@ -54,7 +54,7 @@ func TestPatchAccount(t *testing.T) {
 	})
 
 	t.Run("bad username", func(t *testing.T) {
-		account, err := app.AccountStore.Create("three@test.com", []byte("bar"))
+		account, err := app.AccountStore.Create(test.User{Username: "three@test.com", Password: []byte("bar")})
 		require.NoError(t, err)
 
 		res, err := client.Patch(fmt.Sprintf("/accounts/%v", account.ID), url.Values{"username": []string{""}})

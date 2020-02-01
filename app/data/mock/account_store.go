@@ -59,16 +59,18 @@ func (s *accountStore) FindByOauthAccount(provider string, providerID string) (*
 	return dupAccount(*s.accountsByID[id]), nil
 }
 
-func (s *accountStore) Create(u string, p []byte) (*models.Account, error) {
-	if s.idByUsername[u] != 0 {
+func (s *accountStore) Create(user struct {Username string; Password []byte; Name string; PictureURL string}) (*models.Account, error) {
+	if s.idByUsername[user.Username] != 0 {
 		return nil, Error{ErrNotUnique}
 	}
 
 	now := time.Now()
 	acc := models.Account{
 		ID:                len(s.accountsByID) + 1,
-		Username:          u,
-		Password:          p,
+		Username:          user.Username,
+		Password:          user.Password,
+		Name:              user.Name,
+		Picture:           user.PictureURL,
 		PasswordChangedAt: now,
 		CreatedAt:         now,
 		UpdatedAt:         now,

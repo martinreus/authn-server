@@ -14,7 +14,7 @@ func NewGoogleProvider(credentials *Credentials) *Provider {
 	config := &oauth2.Config{
 		ClientID:     credentials.ID,
 		ClientSecret: credentials.Secret,
-		Scopes:       []string{"email"},
+		Scopes:       []string{"email", "profile"},
 		Endpoint:     google.Endpoint,
 	}
 
@@ -34,6 +34,7 @@ func NewGoogleProvider(credentials *Credentials) *Provider {
 			}
 
 			var user UserInfo
+
 			err = json.Unmarshal(body, &user)
 			return &user, err
 		},

@@ -4,17 +4,17 @@ import (
 	"github.com/keratin/authn-server/lib/parse"
 	"net/http"
 
-	"github.com/keratin/authn-server/server/sessions"
 	"github.com/keratin/authn-server/app"
-	"github.com/keratin/authn-server/lib/route"
 	"github.com/keratin/authn-server/app/services"
+	"github.com/keratin/authn-server/lib/route"
+	"github.com/keratin/authn-server/server/sessions"
 )
 
 func PostPassword(app *app.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var credentials struct {
-			Token string
-			Password string
+			Token           string
+			Password        string
 			CurrentPassword string
 		}
 		if err := parse.Payload(r, &credentials); err != nil {

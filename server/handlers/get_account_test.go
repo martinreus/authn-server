@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/keratin/authn-server/server/test"
-	"github.com/keratin/authn-server/lib/route"
 	"github.com/keratin/authn-server/app/models"
+	"github.com/keratin/authn-server/lib/route"
+	"github.com/keratin/authn-server/server/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -32,7 +32,7 @@ func TestGetAccount(t *testing.T) {
 	})
 
 	t.Run("valid account", func(t *testing.T) {
-		account, err := app.AccountStore.Create("unlocked@test.com", []byte("bar"))
+		account, err := app.AccountStore.Create(test.User{Username: "unlocked@test.com", Password: []byte("bar"), Name: "Some Dude", PictureURL: "http://pic.com"})
 		require.NoError(t, err)
 
 		res, err := client.Get(fmt.Sprintf("/accounts/%v", account.ID))
@@ -48,6 +48,8 @@ func assertGetAccountResponse(t *testing.T, res *http.Response, acc *models.Acco
 	responseData := struct {
 		ID       int    `json:"id"`
 		Username string `json:"username"`
+		Name     string `json:"name"`
+		Picture  string `json:"picture"`
 		Locked   bool   `json:"locked"`
 		Deleted  bool   `json:"deleted_at"`
 	}{}
@@ -56,6 +58,8 @@ func assertGetAccountResponse(t *testing.T, res *http.Response, acc *models.Acco
 
 	assert.Equal(t, acc.Username, responseData.Username)
 	assert.Equal(t, acc.ID, responseData.ID)
+	assert.Equal(t, acc.Name, responseData.Name)
+	assert.Equal(t, acc.Picture, responseData.Picture)
 	assert.Equal(t, false, responseData.Locked)
 	assert.Equal(t, false, responseData.Deleted)
 }

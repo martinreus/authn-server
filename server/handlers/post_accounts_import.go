@@ -12,9 +12,11 @@ import (
 func PostAccountsImport(app *app.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user struct {
-			Username string
-			Password string
-			Locked string
+			Username   string
+			Password   string
+			Name       string
+			PictureURL string
+			Locked     string
 		}
 		if err := parse.Payload(r, &user); err != nil {
 			WriteErrors(w, err)
@@ -28,8 +30,12 @@ func PostAccountsImport(app *app.App) http.HandlerFunc {
 		account, err := services.AccountImporter(
 			app.AccountStore,
 			app.Config,
-			user.Username,
-			user.Password,
+			services.User{
+				Username:   user.Username,
+				Password:   []byte(user.Password),
+				Name:       user.Name,
+				PictureURL: user.PictureURL,
+			},
 			locked,
 		)
 		if err != nil {
@@ -41,8 +47,10 @@ func PostAccountsImport(app *app.App) http.HandlerFunc {
 			panic(err)
 		}
 
-		WriteData(w, http.StatusCreated, map[string]int{
-			"id": account.ID,
+		WriteData(w, http.StatusCreated, map[string]interface{}{
+			"id":      account.ID,
+			"name":    account.Name,
+			"picture": account.Picture,
 		})
 	}
 }

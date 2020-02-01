@@ -14,6 +14,9 @@ type Provider struct {
 type UserInfo struct {
 	ID    string `json:"id"`
 	Email string `json:"email"`
+	Name  string `json:"name"`
+	// picture field could possibly be empty
+	Picture string `json:"picture"`
 }
 
 // UserInfoFetcher is the function signature for fetching UserInfo from a Provider

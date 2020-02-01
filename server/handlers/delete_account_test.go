@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/keratin/authn-server/server/test"
 	"github.com/keratin/authn-server/lib/route"
+	"github.com/keratin/authn-server/server/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -25,7 +25,7 @@ func TestDeleteAccount(t *testing.T) {
 	})
 
 	t.Run("unarchived account", func(t *testing.T) {
-		account, err := app.AccountStore.Create("unlocked@test.com", []byte("bar"))
+		account, err := app.AccountStore.Create(test.User{Username: "unlocked@test.com", Password: []byte("bar")})
 		require.NoError(t, err)
 
 		res, err := client.Delete(fmt.Sprintf("/accounts/%v", account.ID))
@@ -38,7 +38,7 @@ func TestDeleteAccount(t *testing.T) {
 	})
 
 	t.Run("archived account", func(t *testing.T) {
-		account, err := app.AccountStore.Create("locked@test.com", []byte("bar"))
+		account, err := app.AccountStore.Create(test.User{Username: "locked@test.com", Password: []byte("bar")})
 		require.NoError(t, err)
 		app.AccountStore.Archive(account.ID)
 

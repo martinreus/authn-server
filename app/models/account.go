@@ -1,10 +1,14 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Account struct {
 	ID                 int
 	Username           string
+	Name               string
+	Picture            string
 	Password           []byte
 	Locked             bool
 	RequireNewPassword bool       `db:"require_new_password"`

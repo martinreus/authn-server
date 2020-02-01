@@ -14,7 +14,7 @@ import (
 
 func TestAccountUpdater(t *testing.T) {
 	accountStore := mock.NewAccountStore()
-	existing, err := accountStore.Create("existing", []byte("secret"))
+	existing, err := accountStore.Create(services.User{Username: "existing", Password: []byte("secret")})
 	require.NoError(t, err)
 
 	t.Run("email usernames", func(t *testing.T) {
@@ -43,7 +43,7 @@ func TestAccountUpdater(t *testing.T) {
 			UsernameMinLength: 3,
 		}
 
-		other, err := accountStore.Create("other", []byte("secret"))
+		other, err := accountStore.Create(services.User{Username: "other", Password: []byte("secret")})
 		require.NoError(t, err)
 
 		err = services.AccountUpdater(accountStore, cfg, existing.ID, other.Username)

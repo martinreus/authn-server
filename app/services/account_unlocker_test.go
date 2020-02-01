@@ -12,12 +12,12 @@ import (
 func TestAccountUnlocker(t *testing.T) {
 	store := mock.NewAccountStore()
 
-	lockedAccount, err := store.Create("locked@keratin.tech", []byte("password"))
+	lockedAccount, err := store.Create(services.User{Username: "locked@keratin.tech", Password: []byte("password")})
 	require.NoError(t, err)
 	_, err = store.Lock(lockedAccount.ID)
 	require.NoError(t, err)
 
-	unlockedAccount, err := store.Create("unlocked@keratin.tech", []byte("password"))
+	unlockedAccount, err := store.Create(services.User{Username: "unlocked@keratin.tech", Password: []byte("password")})
 	require.NoError(t, err)
 
 	var testCases = []struct {

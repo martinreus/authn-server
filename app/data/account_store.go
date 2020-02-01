@@ -12,7 +12,12 @@ import (
 )
 
 type AccountStore interface {
-	Create(u string, p []byte) (*models.Account, error)
+	Create(user struct {
+		Username   string
+		Password   []byte
+		Name       string
+		PictureURL string
+	}) (*models.Account, error)
 	Find(id int) (*models.Account, error)
 	FindByUsername(u string) (*models.Account, error)
 	FindByOauthAccount(p string, pid string) (*models.Account, error)
@@ -30,11 +35,14 @@ type AccountStore interface {
 func NewAccountStore(db sqlx.Ext) (AccountStore, error) {
 	switch db.DriverName() {
 	case "sqlite3":
-		return &sqlite3.AccountStore{Ext: db}, nil
+		store := sqlite3.New(db)
+		return &store, nil
 	case "mysql":
-		return &mysql.AccountStore{Ext: db}, nil
+		store := mysql.New(db)
+		return &store, nil
 	case "postgres":
-		return &postgres.AccountStore{Ext: db}, nil
+		store := postgres.New(db)
+		return &store, nil
 	default:
 		return nil, fmt.Errorf("unsupported driver: %v", db.DriverName())
 	}

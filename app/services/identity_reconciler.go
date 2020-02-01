@@ -4,9 +4,9 @@ import (
 	"encoding/hex"
 	"github.com/keratin/authn-server/app"
 	"github.com/keratin/authn-server/app/data"
+	"github.com/keratin/authn-server/app/models"
 	"github.com/keratin/authn-server/lib"
 	"github.com/keratin/authn-server/lib/oauth"
-	"github.com/keratin/authn-server/app/models"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 )
@@ -58,7 +58,13 @@ func IdentityReconciler(accountStore data.AccountStore, cfg *app.Config, provide
 	}
 	// TODO: transactional account + identity
 	// Note we hex encode token because zxcvbn does not seem to like non-printable characters
-	newAccount, err := AccountCreator(accountStore, cfg, providerUser.Email, hex.EncodeToString(rand))
+	newAccount, err :=
+		AccountCreator(accountStore, cfg, User{
+			Username:   providerUser.Email,
+			Password:   []byte(hex.EncodeToString(rand)),
+			Name:       providerUser.Name,
+			PictureURL: providerUser.Picture,
+		})
 	if err != nil {
 		return nil, errors.Wrap(err, "AccountCreator")
 	}

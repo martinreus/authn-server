@@ -91,6 +91,8 @@ Visibility: Public
 | ------ | ---- | ----- |
 | `username` | string | Must be present and unique. |
 | `password` | string | Must meet minimum complexity scoring per [zxcvbn](https://blogs.dropbox.com/tech/2012/04/zxcvbn-realistic-password-strength-estimation/). |
+| `name` | string | User's complete name. |
+| `pictureURL` | string | A user's profile picture. |
 
 #### Success:
 
@@ -298,6 +300,8 @@ Visibility: Private
 | ------ | ---- | ----- |
 | `username` | string | Must exist and be unique, but otherwise not validated. |
 | `password` | string | May be either an existing BCrypt hash or a plaintext (raw) string. Will not be validated for complexity. |
+| `name` | string | The user's complete name |
+| `pictureURL` | string | A user's profile picture URL |
 | `locked` | boolean | Optional. Will import the account as [locked](#lock-account). |
 
 #### Success:

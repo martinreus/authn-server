@@ -4,17 +4,19 @@ import (
 	"github.com/keratin/authn-server/lib/parse"
 	"net/http"
 
-	"github.com/keratin/authn-server/server/sessions"
 	"github.com/keratin/authn-server/app"
-	"github.com/keratin/authn-server/lib/route"
 	"github.com/keratin/authn-server/app/services"
+	"github.com/keratin/authn-server/lib/route"
+	"github.com/keratin/authn-server/server/sessions"
 )
 
 func PostAccount(app *app.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var credentials struct {
-			Username string
-			Password string
+			Username   string
+			Password   string
+			Name       string
+			PictureURL string
 		}
 		if err := parse.Payload(r, &credentials); err != nil {
 			WriteErrors(w, err)
@@ -23,10 +25,12 @@ func PostAccount(app *app.App) http.HandlerFunc {
 		// Create the account
 		account, err := services.AccountCreator(
 			app.AccountStore,
-			app.Config,
-			credentials.Username,
-			credentials.Password,
-		)
+			app.Config, services.User{
+				Username:   credentials.Username,
+				Password:   []byte(credentials.Password),
+				Name:       credentials.Name,
+				PictureURL: credentials.PictureURL,
+			})
 		if err != nil {
 			if fe, ok := err.(services.FieldErrors); ok {
 				WriteErrors(w, fe)

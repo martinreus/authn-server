@@ -21,6 +21,8 @@ func TestPostAccountSuccess(t *testing.T) {
 	res, err := client.PostForm("/accounts", url.Values{
 		"username": []string{"foo"},
 		"password": []string{"0a0b0c0"},
+		"name": []string{"A name"},
+		"pictureURL": []string{"http://picture.url"},
 	})
 	require.NoError(t, err)
 

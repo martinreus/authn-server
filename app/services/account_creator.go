@@ -10,8 +10,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func AccountCreator(store data.AccountStore, cfg *app.Config, username string, password string) (*models.Account, error) {
-	username = strings.TrimSpace(username)
+func AccountCreator(store data.AccountStore, cfg *app.Config, user User) (*models.Account, error) {
+	username := strings.TrimSpace(user.Username)
 
 	errs := FieldErrors{}
 
@@ -20,7 +20,7 @@ func AccountCreator(store data.AccountStore, cfg *app.Config, username string, p
 		errs = append(errs, *fieldError)
 	}
 
-	fieldError = PasswordValidator(cfg, password)
+	fieldError = PasswordValidator(cfg, string(user.Password))
 	if fieldError != nil {
 		errs = append(errs, *fieldError)
 	}
@@ -29,12 +29,12 @@ func AccountCreator(store data.AccountStore, cfg *app.Config, username string, p
 		return nil, errs
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), cfg.BcryptCost)
+	hash, err := bcrypt.GenerateFromPassword(user.Password, cfg.BcryptCost)
 	if err != nil {
 		return nil, errors.Wrap(err, "bcrypt")
 	}
 
-	acc, err := store.Create(username, hash)
+	acc, err := store.Create(User{Username: username, Password: hash, Name: user.Name, PictureURL: user.PictureURL})
 
 	if err != nil {
 		if data.IsUniquenessError(err) {

@@ -8,11 +8,15 @@ import (
 	"github.com/keratin/authn-server/app/models"
 )
 
-type AccountStore struct {
+func New(db sqlx.Ext) accountStore {
+	return accountStore{db}
+}
+
+type accountStore struct {
 	sqlx.Ext
 }
 
-func (db *AccountStore) Find(id int) (*models.Account, error) {
+func (db *accountStore) Find(id int) (*models.Account, error) {
 	account := models.Account{}
 	err := sqlx.Get(db, &account, "SELECT * FROM accounts WHERE id = $1", id)
 	if err == sql.ErrNoRows {
@@ -22,11 +26,13 @@ func (db *AccountStore) Find(id int) (*models.Account, error) {
 	}
 	if account.DeletedAt != nil {
 		account.Username = ""
+		account.Picture = ""
+		account.Name = ""
 	}
 	return &account, nil
 }
 
-func (db *AccountStore) FindByUsername(u string) (*models.Account, error) {
+func (db *accountStore) FindByUsername(u string) (*models.Account, error) {
 	account := models.Account{}
 	err := sqlx.Get(db, &account, "SELECT * FROM accounts WHERE username = $1 AND deleted_at IS NULL", u)
 	if err == sql.ErrNoRows {
@@ -37,7 +43,7 @@ func (db *AccountStore) FindByUsername(u string) (*models.Account, error) {
 	return &account, nil
 }
 
-func (db *AccountStore) FindByOauthAccount(provider string, providerID string) (*models.Account, error) {
+func (db *accountStore) FindByOauthAccount(provider string, providerID string) (*models.Account, error) {
 	account := models.Account{}
 	err := sqlx.Get(db, &account, "SELECT a.* FROM accounts a INNER JOIN oauth_accounts oa ON a.id = oa.account_id WHERE oa.provider = $1 AND oa.provider_id = $2", provider, providerID)
 	if err == sql.ErrNoRows {
@@ -48,12 +54,19 @@ func (db *AccountStore) FindByOauthAccount(provider string, providerID string) (
 	return &account, nil
 }
 
-func (db *AccountStore) Create(u string, p []byte) (*models.Account, error) {
+func (db *accountStore) Create(user struct {
+	Username   string
+	Password   []byte
+	Name       string
+	PictureURL string
+}) (*models.Account, error) {
 	now := time.Now()
 
 	account := &models.Account{
-		Username:          u,
-		Password:          p,
+		Username:          user.Username,
+		Password:          user.Password,
+		Name:              user.Name,
+		Picture:           user.PictureURL,
 		PasswordChangedAt: now,
 		CreatedAt:         now,
 		UpdatedAt:         now,
@@ -63,13 +76,15 @@ func (db *AccountStore) Create(u string, p []byte) (*models.Account, error) {
 		`INSERT INTO accounts (
 			username,
 			password,
+			name,
+			picture,
 			locked,
 			require_new_password,
 			password_changed_at,
 			created_at,
 			updated_at
 		)
-		VALUES (:username, :password, :locked, :require_new_password, :password_changed_at, :created_at, :updated_at)
+		VALUES (:username, :password, :name, :picture, :locked, :require_new_password, :password_changed_at, :created_at, :updated_at)
 		RETURNING id`,
 		account,
 	)
@@ -88,7 +103,7 @@ func (db *AccountStore) Create(u string, p []byte) (*models.Account, error) {
 	return account, nil
 }
 
-func (db *AccountStore) AddOauthAccount(accountID int, provider string, providerID string, accessToken string) error {
+func (db *accountStore) AddOauthAccount(accountID int, provider string, providerID string, accessToken string) error {
 	now := time.Now()
 
 	_, err := sqlx.NamedExec(db, `
@@ -105,13 +120,13 @@ func (db *AccountStore) AddOauthAccount(accountID int, provider string, provider
 	return err
 }
 
-func (db *AccountStore) GetOauthAccounts(accountID int) ([]*models.OauthAccount, error) {
+func (db *accountStore) GetOauthAccounts(accountID int) ([]*models.OauthAccount, error) {
 	accounts := []*models.OauthAccount{}
 	err := sqlx.Select(db, &accounts, `SELECT * FROM oauth_accounts WHERE account_id = $1`, accountID)
 	return accounts, err
 }
 
-func (db *AccountStore) Archive(id int) (bool, error) {
+func (db *accountStore) Archive(id int) (bool, error) {
 	_, err := db.Exec("DELETE FROM oauth_accounts WHERE account_id = $1", id)
 	if err != nil {
 		return false, err
@@ -126,22 +141,22 @@ func (db *AccountStore) Archive(id int) (bool, error) {
 	return ok(result, err)
 }
 
-func (db *AccountStore) Lock(id int) (bool, error) {
+func (db *accountStore) Lock(id int) (bool, error) {
 	result, err := db.Exec("UPDATE accounts SET locked = $1, updated_at = $2 WHERE id = $3", true, time.Now(), id)
 	return ok(result, err)
 }
 
-func (db *AccountStore) Unlock(id int) (bool, error) {
+func (db *accountStore) Unlock(id int) (bool, error) {
 	result, err := db.Exec("UPDATE accounts SET locked = $1, updated_at = $2 WHERE id = $3", false, time.Now(), id)
 	return ok(result, err)
 }
 
-func (db *AccountStore) RequireNewPassword(id int) (bool, error) {
+func (db *accountStore) RequireNewPassword(id int) (bool, error) {
 	result, err := db.Exec("UPDATE accounts SET require_new_password = $1, updated_at = $2 WHERE id = $3", true, time.Now(), id)
 	return ok(result, err)
 }
 
-func (db *AccountStore) SetPassword(id int, p []byte) (bool, error) {
+func (db *accountStore) SetPassword(id int, p []byte) (bool, error) {
 	result, err := db.Exec(`
 		UPDATE accounts
 		SET
@@ -154,12 +169,12 @@ func (db *AccountStore) SetPassword(id int, p []byte) (bool, error) {
 	return ok(result, err)
 }
 
-func (db *AccountStore) UpdateUsername(id int, u string) (bool, error) {
+func (db *accountStore) UpdateUsername(id int, u string) (bool, error) {
 	result, err := db.Exec("UPDATE accounts SET username = $1, updated_at = $2 WHERE id = $3", u, time.Now(), id)
 	return ok(result, err)
 }
 
-func (db *AccountStore) SetLastLogin(id int) (bool, error) {
+func (db *accountStore) SetLastLogin(id int) (bool, error) {
 	result, err := db.Exec("UPDATE accounts SET last_login_at = $1 WHERE id = $2", time.Now(), id)
 	return ok(result, err)
 }

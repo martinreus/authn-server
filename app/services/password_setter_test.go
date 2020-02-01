@@ -23,7 +23,7 @@ func TestPasswordSetter(t *testing.T) {
 		return services.PasswordSetter(accountStore, &ops.LogReporter{logrus.New()}, cfg, id, password)
 	}
 
-	account, err := accountStore.Create("existing@keratin.tech", []byte("old"))
+	account, err := accountStore.Create(services.User{Username: "existing@keratin.tech", Password: []byte("old")})
 	require.NoError(t, err)
 
 	t.Run("sets password", func(t *testing.T) {

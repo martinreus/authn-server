@@ -18,7 +18,7 @@ func TestGetPasswordReset(t *testing.T) {
 	client := route.NewClient(server.URL).Referred(&app.Config.ApplicationDomains[0])
 
 	t.Run("known account", func(t *testing.T) {
-		_, err := app.AccountStore.Create("known@keratin.tech", []byte("pwd"))
+		_, err := app.AccountStore.Create(test.User{Username: "known@keratin.tech", Password: []byte("pwd")})
 		require.NoError(t, err)
 
 		res, err := client.Get("/password/reset?username=known@keratin.tech")
